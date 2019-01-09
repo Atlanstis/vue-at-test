@@ -1,6 +1,6 @@
 <template>
   <div id="app">
-    <at-ta :members="members" name-key="name" v-model="text">
+    <at-ta :members="members" name-key="name" v-model="text" @at="at" ref="at" :isFromNet="true">
       <!-- custom: with avatars -->
       <template slot="item" slot-scope="s">
         <img :src="s.item.avatar">
@@ -14,6 +14,7 @@
       </el-input>
     </at-ta>
     {{text}}
+    <button @click="test">test</button>
   </div>
 </template>
 
@@ -43,8 +44,26 @@ export default {
   name: 'app',
   data () {
     return {
-      members,
+      members: [],
       text: ''
+    }
+  },
+  methods: {
+    at (val) {
+      console.log(val)
+      setTimeout(() => {
+        if (val === '') {
+          this.$refs.at.updateList(members)
+        } else {
+          let list = members.filter((v) => {
+            return v.name.indexOf(val) > -1
+          })
+          this.$refs.at.updateList(list)
+        }
+      }, 20)
+    },
+    test () {
+      this.$refs.at.test()
     }
   }
 }

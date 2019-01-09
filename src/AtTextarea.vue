@@ -68,6 +68,10 @@ export default {
     scrollRef: {
       type: String,
       default: ''
+    },
+    isFromNet: { // @数据是否从外部来
+      type: Boolean,
+      default: false
     }
   },
   data () {
@@ -76,7 +80,10 @@ export default {
       // initial :value/v-model is present (not nil)
       bindsValue: this.value != null,
       hasComposition: false,
-      atwho: null
+      atwho: null,
+      timePeriod: 200,
+      temporaryStorage: [],
+      chosens: []
     }
   },
   computed: {
@@ -159,7 +166,10 @@ export default {
           return
         }
       }
-
+      // CTRL + C 时，阻止执行
+      if (e.keyCode === 67 && e.ctrlKey) {
+        return
+      }
       // 为了兼容ie ie9~11 editable无input事件 只能靠keydown触发 textarea正常
       // 另 ie9 textarea的delete不触发input
       const isValid = (e.keyCode >= 48 && e.keyCode <= 90) || e.keyCode === 8
@@ -225,11 +235,12 @@ export default {
       const el = this.$el.querySelector('textarea')
       const text = el.value.slice(0, el.selectionEnd)
       if (text) {
-        const { atItems, members, suffix, deleteMatch, itemName } = this
+        const { atItems, members, suffix, deleteMatch, itemName, chosens, isFromNet } = this
         const { at, index } = getAtAndIndex(text, atItems)
         if (index > -1) {
           const chunk = text.slice(index + at.length)
-          const has = members.some(v => {
+          let list = isFromNet ? chosens : members
+          const has = list.some(v => {
             const name = itemName(v)
             return deleteMatch(name, chunk, suffix)
           })
@@ -243,21 +254,28 @@ export default {
         }
       }
     },
-
     handleInput (keep) {
-      debugger
+      if (this.timeout) {
+        clearTimeout(this.timeout)
+        this.timeout = null
+      }
+      this.timeout = setTimeout(() => {
+        this.handleInputHandle(keep)
+      }, this.timePeriod)
+    },
+    handleInputHandle (keep) {
       if (this.hasComposition) return
       const el = this.$el.querySelector('textarea')
       this.$emit('input', el.value)
 
       const text = el.value.slice(0, el.selectionEnd)
       if (text) {
-        const { atItems, avoidEmail, allowSpaces } = this
+        const { atItems, avoidEmail, allowSpaces, suffix } = this
         let show = true
-        const { at, index } = getAtAndIndex(text, atItems)
+        const { at, index } = getAtAndIndex(text, atItems) // at: @ index: @位置
         if (index < 0) show = false
-        const prev = text[index - 1]
-        const chunk = text.slice(index + at.length, text.length)
+        const prev = text[index - 1] // 光标前一个位置
+        const chunk = text.slice(index + at.length, text.length) // @ 后面所跟字符
         if (avoidEmail) {
           // 上一个字符不能为字母数字 避免与邮箱冲突
           // 微信则是避免 所有字母数字及半角符号
@@ -266,7 +284,6 @@ export default {
         if (!allowSpaces && /\s/.test(chunk)) {
           show = false
         }
-
         // chunk以空白字符开头不匹配 避免`@ `也匹配
         if (/^\s/.test(chunk)) show = false
         if (!show) {
@@ -274,21 +291,44 @@ export default {
         } else {
           const { members, filterMatch, itemName } = this
           if (!keep) {
-            this.$emit('at', chunk)
+            let suffixIndex = text.lastIndexOf(suffix)
+            if (index > suffixIndex) {
+              this.$emit('at', chunk)
+            }
           }
-          const matched = members.filter(v => {
-            const name = itemName(v)
-            return filterMatch(name, chunk, at)
-          })
-          if (matched.length) {
-            this.openPanel(matched, chunk, index, at, keep)
+          if (this.isFromNet) {
+            this.temporaryStorage = {
+              chunk, index, at, keep
+            }
           } else {
-            this.closePanel()
+            const matched = members.filter(v => {
+              const name = itemName(v)
+              return filterMatch(name, chunk, at)
+            })
+            if (matched.length) {
+              this.openPanel(matched, chunk, index, at, keep)
+            } else {
+              this.closePanel()
+            }
           }
         }
+      } else {
+        this.closePanel()
       }
+      // let elLenth = el.value.length
+      // let elEnd = el.selectionEnd
+      // let step = elEnd - this.temporaryLength
+      // for (let i = 0; i < this.chosens.length; i++) {
+      //   let v = this.chosens[i]
+      //   if (elEnd - step < v.end) {
+      //     if (elEnd - step <= v.start) {
+      //       v.start += step
+      //     }
+      //     v.end += step
+      //   }
+      // }
+      // this.temporaryLength = elLenth
     },
-
     openPanel (list, chunk, offset, at) {
       const fn = () => {
         const el = this.$el.querySelector('textarea')
@@ -331,8 +371,31 @@ export default {
       el.selectionStart = start
       el.focus() // textarea必须focus回来
       const t = itemName(list[cur]) + suffix
+      this.addChosens(list[cur])
       this.insertText(t, el)
-      this.handleInput()
+      this.closePanel()
+      this.handleInput(true)
+    },
+    addChosens (item) {
+      this.chosens.push(item)
+    },
+    updateList (list) {
+      const {chunk, index, at, keep} = this.temporaryStorage
+      if (list.length) {
+        this.openPanel(list, chunk, index, at, keep)
+      } else {
+        this.closePanel()
+      }
+    },
+    test () {
+      let array = []
+      for (let i = 0; i < this.chosens.length; i++) {
+        let v = this.chosens[i]
+        let obj = {}
+        obj.name = v.name
+        array.push(obj)
+      }
+      console.table(array)
     }
   }
 }
