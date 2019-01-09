@@ -72,6 +72,10 @@ export default {
     isFromNet: { // @数据是否从外部来
       type: Boolean,
       default: false
+    },
+    keyAlias: {
+      type: String,
+      default: 'key'
     }
   },
   data () {
@@ -378,6 +382,14 @@ export default {
     },
     addChosens (item) {
       this.chosens.push(item)
+      // 去重
+      let obj = {}
+      this.chosens = this.chosens.reduce((item, next) => {
+        if (!obj[next[this.keyAlias]]) {
+          obj[next[this.keyAlias]] = true && item.push(next)
+        }
+        return item
+      }, [])
     },
     updateList (list) {
       const {chunk, index, at, keep} = this.temporaryStorage
@@ -388,14 +400,8 @@ export default {
       }
     },
     test () {
-      let array = []
-      for (let i = 0; i < this.chosens.length; i++) {
-        let v = this.chosens[i]
-        let obj = {}
-        obj.name = v.name
-        array.push(obj)
-      }
-      console.table(array)
+      let {chosens} = this
+      console.log(chosens)
     }
   }
 }

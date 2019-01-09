@@ -1,6 +1,6 @@
 <template>
   <div id="app">
-    <at-ta :members="members" name-key="name" v-model="text" @at="at" ref="at" :isFromNet="true">
+    <at-ta :members="members" name-key="name" v-model="text" @at="at" ref="at" :isFromNet="true" :keyAlias="'key'">
       <!-- custom: with avatars -->
       <template slot="item" slot-scope="s">
         <img :src="s.item.avatar">
@@ -35,7 +35,8 @@ let members = [
 members = members.map((v, i) => {
   return {
     avatar: `https://randomuser.me/api/portraits/men/${i % 5}.jpg`,
-    name: v
+    name: v,
+    key: i
   }
 })
 
