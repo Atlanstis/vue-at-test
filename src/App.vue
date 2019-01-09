@@ -1,6 +1,6 @@
 <template>
   <div id="app">
-    <at-ta :members="members" name-key="name" v-model="text" @at="at" ref="at" :isFromNet="true" :keyAlias="'key'">
+    <at-ta :members="members" name-key="name" v-model="text" @at="at" ref="at" :isFromNet="true" :keyAlias="'key'" :nameAlias="'name'">
       <!-- custom: with avatars -->
       <template slot="item" slot-scope="s">
         <img :src="s.item.avatar">
@@ -54,12 +54,12 @@ export default {
       console.log(val)
       setTimeout(() => {
         if (val === '') {
-          this.$refs.at.updateList(members)
+          this.$refs.at.updateMembers(members)
         } else {
           let list = members.filter((v) => {
             return v.name.indexOf(val) > -1
           })
-          this.$refs.at.updateList(list)
+          this.$refs.at.updateMembers(list)
         }
       }, 20)
     },

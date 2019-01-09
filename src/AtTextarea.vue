@@ -3,11 +3,9 @@ import {
   closest, scrollIntoView, getAtAndIndex
 } from './util'
 import AtTemplate from './AtTemplate.vue'
-import At from './At.vue'
 import getCaretCoordinates from 'textarea-caret'
 
 export default {
-  extends: At,
   name: 'AtTextarea',
   mixins: [AtTemplate],
   props: {
@@ -47,9 +45,9 @@ export default {
       type: Array,
       default: () => []
     },
-    nameKey: {
+    nameAlias: {
       type: String,
-      default: ''
+      default: 'name'
     },
     filterMatch: {
       type: Function,
@@ -69,7 +67,7 @@ export default {
       type: String,
       default: ''
     },
-    isFromNet: { // @数据是否从外部来
+    isFromNet: { // 成员数据是否从外部来
       type: Boolean,
       default: false
     },
@@ -132,8 +130,8 @@ export default {
   },
   methods: {
     itemName (v) {
-      const { nameKey } = this
-      return nameKey ? v[nameKey] : v
+      const { nameAlias } = this
+      return nameAlias ? v[nameAlias] : v
     },
     isCur (index) {
       return index === this.atwho.cur
@@ -254,6 +252,7 @@ export default {
             el.selectionStart = index + 1
             el.selectionEnd = index + 1
             this.handleInput()
+            this.updateChosens()
           }
         }
       }
@@ -319,19 +318,6 @@ export default {
       } else {
         this.closePanel()
       }
-      // let elLenth = el.value.length
-      // let elEnd = el.selectionEnd
-      // let step = elEnd - this.temporaryLength
-      // for (let i = 0; i < this.chosens.length; i++) {
-      //   let v = this.chosens[i]
-      //   if (elEnd - step < v.end) {
-      //     if (elEnd - step <= v.start) {
-      //       v.start += step
-      //     }
-      //     v.end += step
-      //   }
-      // }
-      // this.temporaryLength = elLenth
     },
     openPanel (list, chunk, offset, at) {
       const fn = () => {
@@ -391,7 +377,18 @@ export default {
         return item
       }, [])
     },
-    updateList (list) {
+    updateChosens () {
+      let list = []
+      const el = this.$el.querySelector('textarea')
+      this.chosens.forEach((v) => {
+        let position = el.value.indexOf(v[this.nameAlias] + this.suffix)
+        if (position > -1) {
+          list.push(v)
+        }
+      })
+      this.chosens = list
+    },
+    updateMembers (list) {
       const {chunk, index, at, keep} = this.temporaryStorage
       if (list.length) {
         this.openPanel(list, chunk, index, at, keep)
@@ -399,9 +396,33 @@ export default {
         this.closePanel()
       }
     },
+    getInfo () {
+      this.updateChosens()
+      const el = this.$el.querySelector('textarea')
+      let template = this.getTemplate(el.value)
+      return Object.assign({
+        member: this.chosens,
+        text: el.value
+      }, template)
+    },
+    getTemplate (text) {
+      let template = text
+      let templateArr = []
+      this.chosens.forEach((v) => {
+        let position = template.indexOf(v[this.nameAlias] + this.suffix)
+        if (position > -1) {
+          templateArr.push(v[this.keyAlias])
+          template = template.replace(v[this.nameAlias], '{{' + v[this.keyAlias] + '}}')
+        }
+      })
+      return {
+        template,
+        templateArr
+      }
+    },
     test () {
-      let {chosens} = this
-      console.log(chosens)
+      this.updateChosens()
+      console.log(this.getInfo())
     }
   }
 }
