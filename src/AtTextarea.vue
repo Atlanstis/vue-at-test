@@ -204,7 +204,7 @@ export default {
 
     scrollToCur () {
       const curEl = this.$refs.cur[0]
-      const scrollParent = curEl.parentElement.parentElement // .atwho-view
+      const scrollParent = curEl.parentElement.parentElement // .atwho__view
       scrollIntoView(curEl, scrollParent)
     },
     selectByMouse (e) {

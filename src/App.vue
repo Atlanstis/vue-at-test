@@ -1,11 +1,6 @@
 <template>
   <div id="app">
-    <at-ta :members="members" name-key="name" v-model="text" @at="at" ref="at" :isFromNet="true" :keyAlias="'key'" :nameAlias="'name'">
-      <!-- custom: with avatars -->
-      <template slot="item" slot-scope="s">
-        <img :src="s.item.avatar">
-        <span v-text="s.item.name"></span>
-      </template>
+    <at-ta :members="members" name-key="name" v-model="text" @at="at" ref="at" :keyAlias="'key'" :nameAlias="'name'">
       <el-input
         type="textarea"
         :rows="2"
@@ -33,7 +28,6 @@ let members = [
 ]
 members = members.map((v, i) => {
   return {
-    avatar: `https://randomuser.me/api/portraits/men/${i % 5}.jpg`,
     name: v,
     key: i
   }

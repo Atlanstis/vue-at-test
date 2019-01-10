@@ -1,5 +1,5 @@
 // atwho.css https://github.com/ichord/At.js
-.atwho-view {
+.atwho__view {
     // position:absolute;
     // top: 0;
     // left: 0;
@@ -13,7 +13,7 @@
     min-width: 120px;
     z-index: 11110 !important;
 }
-.atwho-ul {
+.atwho__ul {
     /* width: 100px; */
     list-style:none;
     // padding:0;
@@ -21,7 +21,7 @@
     // max-height: 200px;
     // overflow-y: auto;
 }
-.atwho-li {
+.atwho__li {
     display: block;
     // padding: 5px 10px;
     // border-bottom: 1px solid #DDD;
@@ -30,7 +30,7 @@
 }
 
 ////// added 1
-.atwho-view {
+.atwho__view {
   // font-size: 14px;
   // min-width: 140px;
   // max-width: 180px;
@@ -38,12 +38,12 @@
   // overflow: hidden;
   box-shadow: 0 0 10px 0 rgba(101, 111, 122, .5);
 }
-.atwho-ul {
+.atwho__ul {
   max-height: 135px;
   padding: 0;
   margin: 0;
 }
-.atwho-li {
+.atwho__li {
   box-sizing: border-box;
   height: 27px;
   padding: 0 12px;
@@ -55,23 +55,23 @@
     text-overflow: ellipsis;
   }
 }
-.atwho-cur {
+.atwho__cur {
   // background: #44a8f2;
   background: #5BB8FF;
   color: white;
 }
 
 ////// added 2
-.atwho-wrap {
+.atwho__wrap {
   position: relative;
 }
-.atwho-panel {
+.atwho__panel {
   position: absolute;
 }
-.atwho-inner {
+.atwho__inner {
   position: relative;
 }
-.atwho-view {
+.atwho__view {
   position: absolute;
   bottom: 0;
   left: -0.8em; // 抵消左边距
