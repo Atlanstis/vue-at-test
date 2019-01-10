@@ -1,14 +1,14 @@
 <template>
   <div id="app">
-    <at-ta :members="members" v-model="text" @at="at" ref="at" :keyAlias="'key'" :nameAlias="'name'" :deptAlias="'dept'" :affix="affix">
+    <at-ta :members="members" @at="at" ref="at" :keyAlias="'key'" :nameAlias="'name'" :deptAlias="'dept'" :affix="affix">
       <el-input
         type="textarea"
         :rows="2"
-        placeholder="请输入内容"
-        v-model="text">
+        placeholder="请输入内容">
       </el-input>
     </at-ta>
     <button @click="test">test</button>
+    <button @click="clear">clear</button>
   </div>
 </template>
 
@@ -72,6 +72,9 @@ export default {
     test () {
       let obj = this.$refs.at.getInfo()
       console.log(obj)
+    },
+    clear () {
+      this.$refs.at.clear()
     }
   }
 }

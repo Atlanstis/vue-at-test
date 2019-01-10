@@ -413,7 +413,7 @@ export default {
     },
 
     checkNameDuplicate (list) {
-      // 需求中对名称相同的人，在姓名后加上部门信息
+      // 需求中对名称相同的人，显示时在姓名后加上部门信息
       list = JSON.parse(JSON.stringify(list))
       let {nameAlias, deptAlias} = this
       let nameTimes = []
@@ -457,7 +457,6 @@ export default {
     },
     getTemplate (text) {
       let template = text
-      // let newTemplate = ''
       let templateArr = []
       let {nameAlias, keyAlias, suffix, affix, at} = this
       this.chosens.forEach((v) => {
@@ -480,6 +479,13 @@ export default {
         template,
         templateArr
       }
+    },
+    clear () {
+      const el = this.$el.querySelector('textarea')
+      el.value = ''
+      el.selectionStart = 0
+      el.selectionEnd = 0
+      this.chosens = []
     }
   }
 }
