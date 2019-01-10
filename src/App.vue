@@ -1,6 +1,6 @@
 <template>
   <div id="app">
-    <at-ta :members="members" name-key="name" v-model="text" @at="at" ref="at" :keyAlias="'key'" :nameAlias="'name'">
+    <at-ta :members="members" v-model="text" @at="at" ref="at" :keyAlias="'key'" :nameAlias="'name'" :deptAlias="'dept'" :affix="affix">
       <el-input
         type="textarea"
         :rows="2"
@@ -17,7 +17,8 @@ import AtTa from './AtTextarea.vue'
 
 let members = [
   /* eslint-disable */
-  "Roxie Miles","grace.carroll",
+  "Roxie Miles","Roxie Miles",
+  "grace.carroll","grace.carroll",
   "小浩",
   "Helena Perez","melvin.miller",
   "椿木",
@@ -27,9 +28,17 @@ let members = [
   /* eslint-enable */
 ]
 members = members.map((v, i) => {
+  let dept = '研发部'
+  if (i === 0) {
+    dept = '财务部'
+  }
+  if (i === 2) {
+    dept = '财务部'
+  }
   return {
     name: v,
-    key: i
+    key: i,
+    dept: dept
   }
 })
 
@@ -39,7 +48,11 @@ export default {
   data () {
     return {
       members: [],
-      text: ''
+      text: '',
+      affix: {
+        front: '<span>',
+        end: '</span>'
+      }
     }
   },
   methods: {

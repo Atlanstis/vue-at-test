@@ -16,7 +16,7 @@ export default {
     },
     at: {
       type: String,
-      default: null
+      default: '@'
     },
     ats: {
       type: Array,
@@ -75,6 +75,19 @@ export default {
     keyAlias: {
       type: String,
       default: 'key'
+    },
+    deptAlias: {
+      type: String,
+      default: 'dept'
+    },
+    affix: {
+      type: Object,
+      default: () => {
+        return {
+          front: '<span>',
+          end: '</span>'
+        }
+      }
     }
   },
   data () {
@@ -390,12 +403,48 @@ export default {
       this.chosens = list
     },
     updateMembers (list) {
+      list = this.checkNameDuplicate(list)
       const {chunk, index, at, keep} = this.temporaryStorage
       if (list.length) {
         this.openPanel(list, chunk, index, at, keep)
       } else {
         this.closePanel()
       }
+    },
+
+    checkNameDuplicate (list) {
+      // 需求中对名称相同的人，在姓名后加上部门信息
+      list = JSON.parse(JSON.stringify(list))
+      let {nameAlias, deptAlias} = this
+      let nameTimes = []
+      list.forEach((member, i) => {
+        member.nameOrigin = member[nameAlias]
+        let nameKey = nameTimes.filter((name) => {
+          return name.name === member[nameAlias]
+        })
+        if (nameKey.length === 0) {
+          nameTimes.push({
+            name: member[nameAlias],
+            times: 1
+          })
+        } else {
+          nameKey[0].times += 1
+        }
+      })
+      let nameStr = ''
+      nameTimes.forEach((nameObj) => {
+        if (nameObj.times > 1) {
+          nameStr += `${nameObj.name},`
+        }
+      })
+      if (nameStr !== '') {
+        list.forEach((member) => {
+          if (nameStr.indexOf(member[nameAlias]) > -1) {
+            member[nameAlias] = `${member[nameAlias]}(${member[deptAlias]})`
+          }
+        })
+      }
+      return list
     },
     getInfo () {
       this.updateChosens()
@@ -408,15 +457,22 @@ export default {
     },
     getTemplate (text) {
       let template = text
+      // let newTemplate = ''
       let templateArr = []
-      let {nameAlias, keyAlias, suffix} = this
+      let {nameAlias, keyAlias, suffix, affix, at} = this
       this.chosens.forEach((v) => {
-        let position = template.indexOf(v[nameAlias] + suffix)
+        let atWho = `${at}${v[nameAlias]}${suffix}`
+        let position = template.indexOf(atWho)
         if (position > -1) {
-          templateArr.push(v[this.keyAlias])
+          templateArr.push(v[keyAlias])
+          let name = v[nameAlias] === v.nameOrigin ? v[nameAlias] : v.nameOrigin
           while (position > -1) {
-            template = template.replace(v[nameAlias], '{{' + v[keyAlias] + '}}')
-            position = template.indexOf(v[nameAlias] + suffix)
+            let newAtWho = `${affix.front}${at}${name}${suffix}${affix.end}`
+            let tempLeft = template.substring(0, position)
+            let tempRight = template.substring(position)
+            tempRight = tempRight.replace(atWho, newAtWho)
+            template = tempLeft + tempRight
+            position = template.indexOf(atWho, position + newAtWho.length)
           }
         }
       })
