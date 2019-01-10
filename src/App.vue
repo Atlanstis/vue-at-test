@@ -13,7 +13,6 @@
         v-model="text">
       </el-input>
     </at-ta>
-    {{text}}
     <button @click="test">test</button>
   </div>
 </template>
@@ -64,7 +63,8 @@ export default {
       }, 20)
     },
     test () {
-      this.$refs.at.test()
+      let obj = this.$refs.at.getInfo()
+      console.log(obj)
     }
   }
 }
@@ -95,5 +95,9 @@ body {
 }
 #app .atwho-li span {
   padding-left: 8px;
+}
+
+.el-textarea {
+  width: 500px;
 }
 </style>

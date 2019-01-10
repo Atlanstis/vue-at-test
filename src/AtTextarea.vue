@@ -1,3 +1,4 @@
+
 <script>
 import {
   closest, scrollIntoView, getAtAndIndex
@@ -69,7 +70,7 @@ export default {
     },
     isFromNet: { // 成员数据是否从外部来
       type: Boolean,
-      default: false
+      default: true
     },
     keyAlias: {
       type: String,
@@ -408,21 +409,21 @@ export default {
     getTemplate (text) {
       let template = text
       let templateArr = []
+      let {nameAlias, keyAlias, suffix} = this
       this.chosens.forEach((v) => {
-        let position = template.indexOf(v[this.nameAlias] + this.suffix)
+        let position = template.indexOf(v[nameAlias] + suffix)
         if (position > -1) {
           templateArr.push(v[this.keyAlias])
-          template = template.replace(v[this.nameAlias], '{{' + v[this.keyAlias] + '}}')
+          while (position > -1) {
+            template = template.replace(v[nameAlias], '{{' + v[keyAlias] + '}}')
+            position = template.indexOf(v[nameAlias] + suffix)
+          }
         }
       })
       return {
         template,
         templateArr
       }
-    },
-    test () {
-      this.updateChosens()
-      console.log(this.getInfo())
     }
   }
 }
