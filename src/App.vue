@@ -1,19 +1,23 @@
 <template>
-  <div id="app">
-    <at-ta :members="members" @at="at" ref="at" :keyAlias="'key'" :nameAlias="'name'" :deptAlias="'dept'" :affix="affix">
-      <el-input
-        type="textarea"
-        :rows="2"
-        placeholder="请输入内容">
-      </el-input>
-    </at-ta>
-    <button @click="test">test</button>
-    <button @click="clear">clear</button>
+  <div id="app" class="template__at-who">
+    <div>
+      <at-who @at="at" ref="at" :keyAlias="'key'" :nameAlias="'name'" :deptAlias="'dept'" :affix="affix">
+        <el-input
+          type="textarea"
+          :rows="2"
+          placeholder="请输入内容">
+        </el-input>
+      </at-who>
+      <div class="template__btns">
+        <el-button @click="test">测试</el-button>
+        <el-button @click="clear">清除</el-button>
+      </div>
+    </div>
   </div>
 </template>
 
 <script>
-import AtTa from './AtTextarea.vue'
+import AtWho from './AtTextarea'
 
 let members = [
   /* eslint-disable */
@@ -43,14 +47,14 @@ members = members.map((v, i) => {
 })
 
 export default {
-  components: { AtTa },
+  components: { AtWho },
   name: 'app',
   data () {
     return {
       members: [],
       text: '',
       affix: {
-        front: '<span>',
+        front: '<span class="template_person">',
         end: '</span>'
       }
     }
@@ -72,6 +76,9 @@ export default {
     test () {
       let obj = this.$refs.at.getInfo()
       console.log(obj)
+      this.$alert(obj.template, 'HTML', {
+        dangerouslyUseHTMLString: true
+      })
     },
     clear () {
       this.$refs.at.clear()
@@ -81,30 +88,20 @@ export default {
 </script>
 
 <style>
-html {
+.template__at-who {
   width: 100%;
   height: 100%;
-}
-body {
-  width: 100%;
-  height: 100%;
+  margin-top: 200px;
   display: flex;
-  justify-content: center;
   align-items: center;
-  margin: 0;
+  justify-content: center;
 }
-
-/* override styles */
-#app .atwho-li {
-  padding: 0 4px;
+.template__btns {
+  text-align: center;
+  margin-top: 20px;
 }
-#app .atwho-li img {
-  height: 100%;
-  width: auto;
-  transform: scale(.8);
-}
-#app .atwho-li span {
-  padding-left: 8px;
+.template_person {
+  color: #FF8E3D;
 }
 
 .el-textarea {
